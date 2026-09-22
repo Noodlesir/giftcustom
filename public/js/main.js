@@ -238,12 +238,23 @@
     updatePriceSummary();
   }
 
+  // The checkout screen has two numbers that must always agree: the
+  // "Estimated" row in the summary list (built in buildCheckoutSummary)
+  // and the Subtotal/Total in the price box below it. Both now read from
+  // the same source — the selected theme's price, falling back to the
+  // raw budget only if no theme was chosen yet — so a user never sees
+  // two different totals on the same screen right before confirming.
+  function getDisplayTotal() {
+    return state.selectedTheme ? state.selectedTheme.totalPrice : state.budget;
+  }
+
   function updatePriceSummary() {
     const subtotalEl = $('#priceSubtotal');
     const totalEl = $('#priceTotal');
     const noteEl = $('#priceNote');
-    if (subtotalEl) subtotalEl.textContent = formatPrice(state.budget);
-    if (totalEl) totalEl.textContent = formatPrice(state.budget);
+    const total = getDisplayTotal();
+    if (subtotalEl) subtotalEl.textContent = formatPrice(total);
+    if (totalEl) totalEl.textContent = formatPrice(total);
     if (noteEl) noteEl.textContent = `Prices shown in ${state.currency}`;
   }
 
@@ -408,13 +419,21 @@
     });
   });
 
-giftTypeGrid.addEventListener('click', (e) => {
-  const chip = e.target.closest('.chip-card');
-  if (!chip) return;
-  const pressed = chip.getAttribute('aria-pressed') === 'true';
-  chip.setAttribute('aria-pressed', String(!pressed));
-  setFieldError('giftType', '');
-});
+  // FIX: this element was referenced everywhere below but never assigned —
+  // `giftTypeGrid.addEventListener(...)` was throwing a ReferenceError at
+  // script-load time, which silently killed every listener registered
+  // after it (Generate Theme Ideas, checkout, confirm, back buttons, the
+  // mobile menu, and the initial showScreen('home') call). This one line
+  // was the entire wizard breaking past Step 3.
+  const giftTypeGrid = $('#giftTypeGrid');
+
+  giftTypeGrid.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip-card');
+    if (!chip) return;
+    const pressed = chip.getAttribute('aria-pressed') === 'true';
+    chip.setAttribute('aria-pressed', String(!pressed));
+    setFieldError('giftType', '');
+  });
 
   $('#btnGenerate').addEventListener('click', () => {
     const selected = $$('.chip-card[aria-pressed="true"]', giftTypeGrid).map(c => c.dataset.gifttype);
@@ -633,7 +652,7 @@ giftTypeGrid.addEventListener('click', (e) => {
   function buildCheckoutSummary() {
     const list = $('#summaryList');
     const themeName = state.selectedTheme ? state.selectedTheme.name : '—';
-    const themeTotal = state.selectedTheme ? state.selectedTheme.totalPrice : state.budget;
+    const themeTotal = getDisplayTotal();
     const rows = [
       ['Recipient', `${state.recipientName} · ${state.relationship}`],
       ['Occasion', capitalize(state.occasion)],
@@ -737,7 +756,6 @@ giftTypeGrid.addEventListener('click', (e) => {
     }
 
     if (bodyEl) {
-      const themeTotal = state.selectedTheme ? state.selectedTheme.totalPrice : state.budget;
       bodyEl.innerHTML = `
         ${orderId ? `<div class="receipt-row"><span class="receipt-label">Order ID</span><span class="receipt-value">${escapeHTML(orderId)}</span></div>` : ''}
         <div class="receipt-row"><span class="receipt-label">For</span><span class="receipt-value">${escapeHTML(state.recipientName)}</span></div>
@@ -748,7 +766,7 @@ giftTypeGrid.addEventListener('click', (e) => {
     }
 
     if (totalEl) {
-      const themeTotal = state.selectedTheme ? state.selectedTheme.totalPrice : state.budget;
+      const themeTotal = getDisplayTotal();
       totalEl.innerHTML = `
         <span>Total</span>
         <span>${formatPrice(themeTotal)}</span>
@@ -793,19 +811,17 @@ giftTypeGrid.addEventListener('click', (e) => {
   /* Mobile menu toggle                                                   */
   /* ------------------------------------------------------------------ */
   const menuToggle = $('#menuToggle');
-  // Replace your existing menuToggle event listener with this:
-if (menuToggle) {
-  menuToggle.addEventListener('click', () => {
-    const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
-    menuToggle.setAttribute('aria-expanded', String(!expanded));
-    
-    const progress = $('.progress-trail');
-    if (progress) {
-      // Toggle an active class name instead of applying deep inline string overrides
-      progress.classList.toggle('is-mobile-open', !expanded);
-    }
-  });
-}
+  if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', String(!expanded));
+
+      const progress = $('.progress-trail');
+      if (progress) {
+        progress.classList.toggle('is-mobile-open', !expanded);
+      }
+    });
+  }
 
   /* ------------------------------------------------------------------ */
   /* Init                                                                 */
