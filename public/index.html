@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GiftCustom — Curate personalized, thoughtfully made gifts in 5 simple steps. Choose occasion, budget, and theme. Delivered with care." />
+  <meta name="theme-color" content="#3C2430" />
+  <title>GiftCustom — Personalized Gifts, Thoughtfully Made</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&family=Caveat:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Stylesheets (order matters) -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+
+<body data-occasion="default">
+
+  <!-- Hand-inked border filter, reused by .ink-surface / cards / buttons -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="pencilWobble" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.045" numOctaves="2" seed="7" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.2" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <!-- Skip to content -->
+  <a class="skip-link" href="#app">Skip to main content</a>
+
+  <!-- Screen reader live region -->
+  <div id="live-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ── Animated ambient background ───────────────────────────────────── -->
+  <div class="bloom" aria-hidden="true">
+    <span class="bloom-shape shape-a"></span>
+    <span class="bloom-shape shape-b"></span>
+    <span class="bloom-shape shape-c"></span>
+    <span class="bloom-shape shape-d"></span>
+  </div>
+
+  <!-- Particle canvas -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <!-- ── Header / Topbar ───────────────────────────────────────────────── -->
+  <header class="topbar" role="banner">
+    <div class="topbar-inner">
+      <span class="wordmark" aria-label="GiftCustom home">
+        <svg class="wordmark-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <rect x="3" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M11 10V20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M7 10c0-2.5 4-5 4-5s4 2.5 4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M3 10h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        GiftCustom<span class="wordmark-dot">.</span>
+      </span>
+
+      <nav class="progress-trail" aria-label="Order progress">
+        <ol id="progressList" role="list">
+          <li data-step="recipient" aria-label="Step 1: Recipient">
+            <span class="step-num" aria-hidden="true">1</span>
+            <span class="step-label">Recipient</span>
+          </li>
+          <li data-step="occasion" aria-label="Step 2: Occasion">
+            <span class="step-num" aria-hidden="true">2</span>
+            <span class="step-label">Occasion</span>
+          </li>
+          <li data-step="budget" aria-label="Step 3: Gift">
+            <span class="step-num" aria-hidden="true">3</span>
+            <span class="step-label">Gift</span>
+          </li>
+          <li data-step="theme" aria-label="Step 4: Theme">
+            <span class="step-num" aria-hidden="true">4</span>
+            <span class="step-label">Theme</span>
+          </li>
+          <li data-step="checkout" aria-label="Step 5: Review">
+            <span class="step-num" aria-hidden="true">5</span>
+            <span class="step-label">Review</span>
+          </li>
+        </ol>
+      </nav>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        aria-controls="progressList"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main Application ─────────────────────────────────────────────── -->
+  <main id="app" class="app" role="main">
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 1 — HOME
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen is-active"
+      id="screen-home"
+      data-screen="home"
+      aria-labelledby="home-heading"
+    >
+      <div class="hero">
+        <p class="eyebrow" id="heroEyebrow">A studio for considered gifting</p>
+        <h1 id="home-heading" class="hero-title">
+          <span class="line">Gifts, composed</span>
+          <span class="line">around someone</span>
+          <span class="line accent-line">you love.</span>
+        </h1>
+        <p class="hero-tagline">
+          Personalized gifts made thoughtful, simple, and memorable.
+        </p>
+        <button type="button" class="btn btn-primary btn-large btn-glow" id="btnStart">
+          Send a Gift
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M4 9H14M14 9L9.5 4.5M14 9L9.5 13.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="hero-meta" aria-label="Quick stats">
+          <div class="meta-item">
+            <span class="meta-num" data-count="5" aria-label="5 step ritual">0</span>
+            <span class="meta-label">step ritual</span>
+          </div>
+          <div class="meta-divider" aria-hidden="true"></div>
+          <div class="meta-item">
+            <span class="meta-num" id="heroCurrency" aria-label="Your currency">₹</span>
+            <span class="meta-label">your budget, exactly</span>
+          </div>
+          <div class="meta-divider" aria-hidden="true"></div>
+          <div class="meta-item">
+            <span class="meta-num" data-count="50" aria-label="50+ theme combinations">0</span>
+            <span class="meta-label">theme combinations</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature highlights -->
+      <div class="feature-strip" aria-label="Our promise">
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="feature-text">Curated with care</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="feature-text">Delivered on time</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="feature-text">Made with love</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 2 — RECIPIENT
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-recipient"
+      data-screen="recipient"
+      aria-labelledby="recipient-heading"
+    >
+      <div class="screen-inner">
+        <div class="step-header">
+          <p class="step-eyebrow">Step 1 of 5</p>
+          <h2 id="recipient-heading" class="screen-title">Who is this for?</h2>
+          <p class="screen-sub">Tell us about them — this shapes everything that follows.</p>
+        </div>
+
+        <form id="formRecipient" novalidate>
+          <div class="field" data-field="name">
+            <label for="recipientName">Recipient's name</label>
+            <input
+              type="text"
+              id="recipientName"
+              name="recipientName"
+              autocomplete="off"
+              placeholder="e.g. Ananya"
+              required
+              aria-describedby="err-recipientName"
+            />
+            <p class="field-error" id="err-recipientName" role="alert" aria-live="assertive"></p>
+          </div>
+
+          <div class="field" data-field="relationship">
+            <label for="relationship">Your relationship</label>
+            <select
+              id="relationship"
+              name="relationship"
+              required
+              aria-describedby="err-relationship"
+            >
+              <option value="" disabled selected>Choose one</option>
+              <option value="Partner">Partner</option>
+              <option value="Parent">Parent</option>
+              <option value="Friend">Friend</option>
+              <option value="Colleague">Colleague</option>
+              <option value="Sibling">Sibling</option>
+              <option value="Other">Other</option>
+            </select>
+            <p class="field-error" id="err-relationship" role="alert" aria-live="assertive"></p>
+          </div>
+
+          <div class="field" data-field="address">
+            <label for="deliveryAddress">Delivery address</label>
+            <textarea
+              id="deliveryAddress"
+              name="deliveryAddress"
+              rows="3"
+              placeholder="Flat / Street / City / PIN"
+              required
+              aria-describedby="err-deliveryAddress"
+            ></textarea>
+            <p class="field-error" id="err-deliveryAddress" role="alert" aria-live="assertive"></p>
+          </div>
+
+          <div class="screen-actions">
+            <button type="button" class="btn btn-ghost" data-back="home" aria-label="Back to home">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M12 8H4M4 8L7 5M4 8L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Back
+            </button>
+            <button type="submit" class="btn btn-primary">Continue</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 3 — OCCASION
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-occasion"
+      data-screen="occasion"
+      aria-labelledby="occasion-heading"
+    >
+      <div class="screen-inner">
+        <div class="step-header">
+          <p class="step-eyebrow">Step 2 of 5</p>
+          <h2 id="occasion-heading" class="screen-title">What's the occasion?</h2>
+          <p class="screen-sub">The whole page will shift its mood to match.</p>
+        </div>
+
+        <div
+          class="occasion-grid"
+          id="occasionGrid"
+          role="group"
+          aria-label="Choose an occasion"
+        >
+          <button type="button" class="occasion-card" data-occasion="birthday" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <circle cx="20" cy="16" r="10" fill="currentColor" opacity=".15"/>
+                <path d="M20 6c4 4 4 7 0 11s-4 7 0 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M20 28v8M14 33h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Birthday</span>
+            <span class="occasion-desc">Make their day sparkle</span>
+          </button>
+
+          <button type="button" class="occasion-card" data-occasion="anniversary" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <path d="M20 30s-12-7.2-12-16a7 7 0 0 1 12-4.9A7 7 0 0 1 32 14c0 8.8-12 16-12 16Z"
+                  fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Anniversary</span>
+            <span class="occasion-desc">Celebrate your journey</span>
+          </button>
+
+          <button type="button" class="occasion-card" data-occasion="festival" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <path d="M20 6l3.5 8.6L32 16l-7 6 2 9-7-4.6L13 31l2-9-7-6 8.5-1.4Z"
+                  fill="currentColor" opacity=".18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Festival</span>
+            <span class="occasion-desc">Share the festive spirit</span>
+          </button>
+
+          <button type="button" class="occasion-card" data-occasion="sorry" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <path d="M20 10c-5 4-10 8-10 14a10 10 0 0 0 20 0c0-6-5-10-10-14Z"
+                  fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Sorry</span>
+            <span class="occasion-desc">A heartfelt apology</span>
+          </button>
+
+          <button type="button" class="occasion-card" data-occasion="congrats" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <path d="M9 31 28 9M22 9h7v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="28" r="2" fill="currentColor"/>
+                <circle cx="16" cy="14" r="1.6" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Congrats</span>
+            <span class="occasion-desc">Cheer their success</span>
+          </button>
+
+          <button type="button" class="occasion-card" data-occasion="other" aria-pressed="false">
+            <span class="occasion-icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="32" height="32">
+                <rect x="9" y="14" width="22" height="16" rx="2" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 16l11 8 11-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="occasion-label">Other</span>
+            <span class="occasion-desc">Just because moments</span>
+          </button>
+        </div>
+
+        <p class="field-error" id="err-occasion" role="alert" aria-live="assertive"></p>
+
+        <div class="field" data-field="notes">
+          <label for="notes">Anything else we should know?</label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows="3"
+            placeholder="Interests, favorite colors, hobbies, personality, gift preferences…"
+          ></textarea>
+        </div>
+
+        <div class="screen-actions">
+          <button type="button" class="btn btn-ghost" data-back="recipient" aria-label="Back to recipient">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M12 8H4M4 8L7 5M4 8L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary" id="btnOccasionNext">Continue</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 4 — BUDGET & GIFT TYPE
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-budget"
+      data-screen="budget"
+      aria-labelledby="budget-heading"
+    >
+      <div class="screen-inner">
+        <div class="step-header">
+          <p class="step-eyebrow">Step 3 of 5</p>
+          <h2 id="budget-heading" class="screen-title">Set the budget and gift type</h2>
+          <p class="screen-sub">We'll tailor suggestions to fit exactly.</p>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="currency-bar" role="group" aria-label="Choose currency">
+          <label class="currency-label">Choose your currency</label>
+          <div class="currency-options" id="currencyOptions">
+            <button type="button" class="currency-chip active" data-currency="INR" data-symbol="₹" data-rate="1">₹ INR</button>
+            <button type="button" class="currency-chip" data-currency="USD" data-symbol="$" data-rate="0.012">$ USD</button>
+            <button type="button" class="currency-chip" data-currency="GBP" data-symbol="£" data-rate="0.0093">£ GBP</button>
+            <button type="button" class="currency-chip" data-currency="NPR" data-symbol="Rs." data-rate="1.6">Rs. NPR</button>
+            <button type="button" class="currency-chip" data-currency="JPY" data-symbol="¥" data-rate="1.82">¥ JPY</button>
+            <button type="button" class="currency-chip" data-currency="KRW" data-symbol="₩" data-rate="15.8">₩ KRW</button>
+          </div>
+        </div>
+
+        <!-- Budget Slider -->
+        <div class="field" data-field="budget">
+          <label for="budgetRange">Budget</label>
+          <div class="budget-row">
+            <input
+              type="range"
+              id="budgetRange"
+              min="500"
+              max="20000"
+              step="100"
+              value="3000"
+              aria-label="Budget amount, currently ₹3,000"
+              aria-valuemin="500"
+              aria-valuemax="20000"
+              aria-valuenow="3000"
+            />
+            <span class="budget-value" id="budgetValue" aria-live="polite">₹3,000</span>
+          </div>
+          <div class="budget-presets" role="group" aria-label="Budget presets">
+            <button type="button" class="preset-chip" data-value="1000">Budget</button>
+            <button type="button" class="preset-chip active" data-value="3000">Standard</button>
+            <button type="button" class="preset-chip" data-value="5000">Premium</button>
+            <button type="button" class="preset-chip" data-value="10000">Luxury</button>
+          </div>
+        </div>
+
+        <!-- Gift Type -->
+        <div class="field" data-field="gifttype">
+          <span class="group-label" id="giftTypeLabel">Gift type — choose one or more</span>
+          <div class="chip-grid" role="group" aria-labelledby="giftTypeLabel" id="giftTypeGrid">
+            <button type="button" class="chip-card" data-gifttype="Food" aria-pressed="false">
+              <span class="chip-icon" aria-hidden="true">🍽</span>
+              <span class="chip-text">Food</span>
+            </button>
+            <button type="button" class="chip-card" data-gifttype="Flowers" aria-pressed="false">
+              <span class="chip-icon" aria-hidden="true">✿</span>
+              <span class="chip-text">Flowers</span>
+            </button>
+            <button type="button" class="chip-card" data-gifttype="Electronics" aria-pressed="false">
+              <span class="chip-icon" aria-hidden="true">⚙</span>
+              <span class="chip-text">Electronics</span>
+            </button>
+            <button type="button" class="chip-card" data-gifttype="Custom Hamper" aria-pressed="false">
+              <span class="chip-icon" aria-hidden="true">◈</span>
+              <span class="chip-text">Custom Hamper</span>
+            </button>
+          </div>
+          <p class="field-error" id="err-giftType" role="alert" aria-live="assertive"></p>
+        </div>
+
+        <div class="screen-actions">
+          <button type="button" class="btn btn-ghost" data-back="occasion" aria-label="Back to occasion">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M12 8H4M4 8L7 5M4 8L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary btn-glow" id="btnGenerate">
+            Generate Theme Ideas
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 5 — AI THEME
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-theme"
+      data-screen="theme"
+      aria-labelledby="theme-heading"
+    >
+      <div class="screen-inner">
+        <div class="step-header">
+          <p class="step-eyebrow">Step 4 of 5</p>
+          <h2 id="theme-heading" class="screen-title">Curated theme ideas</h2>
+          <p class="screen-sub" id="themeSub">
+            Composed around <span id="themeSubName">your recipient</span>.
+          </p>
+        </div>
+
+        <div class="loader" id="themeLoader" role="status" aria-label="Generating themes">
+          <span class="loader-ring" aria-hidden="true"></span>
+          <div class="loader-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <p>Generating theme ideas…</p>
+        </div>
+
+        <div class="theme-grid" id="themeGrid" hidden role="list" aria-label="Theme options"></div>
+
+        <div class="screen-actions" id="themeActions" hidden>
+          <button type="button" class="btn btn-ghost" data-back="budget" aria-label="Edit inputs">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M12 8H4M4 8L7 5M4 8L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Edit inputs
+          </button>
+          <button type="button" class="btn btn-primary" id="btnToCheckout">Continue to Review</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 6 — CHECKOUT / REVIEW
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-checkout"
+      data-screen="checkout"
+      aria-labelledby="checkout-heading"
+    >
+      <div class="screen-inner">
+        <div class="step-header">
+          <p class="step-eyebrow">Final step</p>
+          <h2 id="checkout-heading" class="screen-title">Review your gift</h2>
+          <p class="screen-sub">Last look before it's on its way.</p>
+        </div>
+
+        <div class="checkout-card">
+          <div class="checkout-theme-banner" id="checkoutBanner">
+            <span class="checkout-theme-icon" aria-hidden="true">🎁</span>
+            <span class="checkout-theme-name" id="checkoutThemeName">Selected Theme</span>
+          </div>
+          <dl class="summary" id="summaryList"></dl>
+        </div>
+
+        <!-- Price Summary -->
+        <div class="price-summary" id="priceSummary" aria-label="Order total">
+          <div class="price-row">
+            <span>Subtotal</span>
+            <span id="priceSubtotal">₹3,000</span>
+          </div>
+          <div class="price-row">
+            <span>Delivery</span>
+            <span class="price-free">FREE</span>
+          </div>
+          <div class="price-divider" role="separator"></div>
+          <div class="price-row price-total">
+            <span>Total</span>
+            <span id="priceTotal">₹3,000</span>
+          </div>
+          <p class="price-note" id="priceNote">Prices shown in INR</p>
+        </div>
+
+        <div class="screen-actions">
+          <button type="button" class="btn btn-ghost" data-back="theme" aria-label="Back to theme selection">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M12 8H4M4 8L7 5M4 8L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+          </button>
+          <button type="button" class="btn btn-primary btn-large btn-glow" id="btnConfirm">
+            Confirm Gift
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 7 — CONFIRMATION
+         ═══════════════════════════════════════════════════════ -->
+    <section
+      class="screen"
+      id="screen-confirm"
+      data-screen="confirm"
+      aria-labelledby="confirm-heading"
+    >
+      <div class="screen-inner confirm-inner">
+        <div class="confirm-illustration" aria-hidden="true">
+          <div class="confirm-mark">
+            <svg width="40" height="40" viewBox="0 0 40 40">
+              <path d="M9 20l7 7 15-15" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="confirm-confetti" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <h2 id="confirm-heading" class="screen-title">Your gift is on its way</h2>
+        <p class="screen-sub" id="confirmDetail">We'll handle the rest, with care.</p>
+
+        <!-- Confirmation Receipt -->
+        <div class="confirm-receipt" id="confirmReceipt" aria-label="Order receipt">
+          <div class="receipt-header">
+            <span class="receipt-status">✓ Confirmed</span>
+            <span class="receipt-date" id="receiptDate"></span>
+          </div>
+          <div class="receipt-body" id="receiptBody"></div>
+          <div class="receipt-total" id="receiptTotal"></div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-glow" id="btnStartOver">
+          Send another gift
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────────────────── -->
+  <footer class="site-footer" id="siteFooter" role="contentinfo">
+    <div class="footer-inner">
+      <p class="footer-brand">GiftCustom<span class="wordmark-dot">.</span></p>
+      <p class="footer-tag">Thoughtful gifting, made simple.</p>
+    </div>
+  </footer>
+
+  <!-- Application JS (ES module, deferred by nature) -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>

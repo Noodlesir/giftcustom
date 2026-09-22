@@ -1,0 +1,20 @@
+{
+  "name": "giftcustom-backend",
+  "version": "1.0.0",
+  "description": "Backend for GiftCustom: AI theme generation + order storage/lookup",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
