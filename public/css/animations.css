@@ -26,9 +26,11 @@
 .shape-d { animation: driftShape 20s ease-in-out infinite reverse; }
 
 /* Confetti burst on the confirmation screen */
+/* --tx and --rot are set per-element by main.js btnConfirm handler so each
+   piece drifts to a different position. The keyframe reads those values. */
 @keyframes confettiFall {
-  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(70px) rotate(260deg); opacity: 0; }
+  0%   { transform: translate(0, -10px) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--tx, 0px), 70px) rotate(var(--rot, 260deg)); opacity: 0; }
 }
 .confirm-confetti span {
   position: absolute;

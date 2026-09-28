@@ -561,7 +561,7 @@
     state.selectedTheme = themes[0];
 
     grid.innerHTML = themes.map((t, i) => `
-      <article class="theme-card${i === 0 ? ' is-selected-theme' : ''}" data-index="${i}">
+      <article class="theme-card${i === 0 ? ' is-selected-theme' : ''}" data-index="${i}" role="listitem">
         <div class="theme-card-head">
           <h3 class="theme-name">${escapeHTML(t.name)}</h3>
           <span class="theme-tone">${escapeHTML(t.tone)}</span>
@@ -603,6 +603,10 @@
     $('#themeSubName').textContent = state.recipientName || 'your recipient';
 
     try {
+      // Convert the INR-base slider value to the selected currency so the AI
+      // prompt receives the correct local-currency amount (e.g. ~36 USD, not
+      // 3000 USD, when the user picked ₹3,000 with USD selected).
+      const convertedBudget = Math.round(state.budget * state.currencyRate);
       const res = await fetch(`${API_BASE}/api/themes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -611,7 +615,7 @@
           relationship: state.relationship,
           occasion: state.occasion,
           notes: state.notes,
-          budget: state.budget,
+          budget: convertedBudget,
           giftTypes: state.giftTypes,
           currency: state.currency,
         }),

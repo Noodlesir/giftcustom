@@ -131,7 +131,12 @@ input[type="range"]#budgetRange {
   appearance: none;
   height: 6px;
   border-radius: 999px;
-  background: linear-gradient(to right, var(--accent-ink) 0%, var(--accent-wash) 0%);
+  /* --range-progress is set dynamically by updateRangeProgress() in main.js */
+  background: linear-gradient(
+    to right,
+    var(--accent-ink) var(--range-progress, 0%),
+    var(--accent-wash) var(--range-progress, 0%)
+  );
   outline: none;
 }
 input[type="range"]#budgetRange::-webkit-slider-thumb {
