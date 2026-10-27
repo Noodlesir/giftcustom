@@ -17,19 +17,7 @@ adds order persistence + lookup.
 - Serves the frontend itself as static files from `public/` (same origin as the API,
   so there's no CORS setup needed in normal use).
 
-## Setup
 
-```bash
-npm install
-cp .env.example .env
-# edit .env and add your ANTHROPIC_API_KEY (get one at https://console.anthropic.com/)
-npm start
-```
-
-Then open **http://localhost:3000**.
-
-If you don't set `ANTHROPIC_API_KEY`, the app still works end-to-end — theme
-generation just uses the deterministic fallback instead of live AI output.
 
 ## Design
 
