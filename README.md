@@ -1,4 +1,5 @@
-# GiftCustom — Backend
+# GiftCustom 
+
 
 A small Node.js/Express backend for the GiftCustom gifting wizard. It replaces the
 frontend's fake, deterministic "AI" theme generator with a real call to Claude, and
